@@ -42,7 +42,7 @@ Global Performance는 3개 지역으로 구분 되며 Configure Zones Myself로 
 
 Shard Key 로 customer_id를 입력하여 줍니다.
 
-Compass 를 실행 하여 데이터를 import 하여 줍니다.   
+Compass 를 실행 하여 데이터 (demo-data.json)를 import 하여 줍니다.   
 
 <img src="/data-locality/images/images07.png" width="70%" height="70%">  
 
@@ -128,4 +128,5 @@ Browserslist: caniuse-lite is outdated. Please run:
 `````
 
 내용 처럼 미주에 있는 데이터만 존재 하는 것을 확인 할 수 있습니다.
-데이터는 location 을 기준으로 각 Shard 에 저장이 됩니다.
+데이터는 location 을 기준으로 각 Shard 에 저장이 됩니다.   
+동일한 방법으로 EMEA, APAC의 Primary에 로그인 하여 데이터를 확인 합니다.
