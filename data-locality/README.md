@@ -42,23 +42,23 @@ Global Performance는 3개 지역으로 구분 되며 Configure Zones Myself로 
 
 Shard Key 로 customer_id를 입력하여 줍니다.
 
-Compass 를 실행 하여 데이터를 import 하여 줍니다.
+Compass 를 실행 하여 데이터를 import 하여 줍니다.   
 
 <img src="/data-locality/images/images07.png" width="70%" height="70%">  
 
-임포트가 완료 되면 다음과 같은 형태의 데이터가 생성 됩니다.
+임포트가 완료 되면 다음과 같은 형태의 데이터가 생성 됩니다.    
 
 <img src="/data-locality/images/images08.png" width="70%" height="70%">  
 
-데이터를 확인 하기 위해 Cloud Console에 로그인 한 후 Cluster database를 클릭 합니다.
+데이터를 확인 하기 위해 Cloud Console에 로그인 한 후 Cluster database를 클릭 합니다.    
 
 <img src="/data-locality/images/images10.png" width="70%" height="70%">  
 
-생성된 3개의 Shard 정보를 볼 수 있으며 Americas의 정보를 보기 위해 다음을 클릭 합니다.
+생성된 3개의 Shard 정보를 볼 수 있으며 Americas의 정보를 보기 위해 다음을 클릭 합니다.    
 
 <img src="/data-locality/images/images11.png" width="70%" height="70%">  
 
-주소 줄을 복사하여 줍니다.
+주소 줄을 복사하여 줍니다.    
 <img src="/data-locality/images/images09.png" width="70%" height="70%">  
 
 직접 해당 데이터 베이스로 접속하여 데이터를 확인 합니다.
@@ -128,3 +128,4 @@ Browserslist: caniuse-lite is outdated. Please run:
 `````
 
 내용 처럼 미주에 있는 데이터만 존재 하는 것을 확인 할 수 있습니다.
+데이터는 location 을 기준으로 각 Shard 에 저장이 됩니다.
