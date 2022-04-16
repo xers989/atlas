@@ -4,7 +4,12 @@
 Auto-failover 로 구성하여 maximum high availability를 구현    
 
 
+
 클러스터의 Replica set 구성시 다른 member 를 다른 region 에 구성    
+다음과 같이 3개의 다른 지역을 사용하여 Replica Set 을 구성합니다. (서울, 도쿄, 홍콩)   
+<img src="/multi-region/images/images06.png" width="70%" height="70%"> 
+
+
 자동으로 클라이언트 애플리케이션의 mongodb driver 는 primary host 를 찾아서 접근 하며 fail over 시 자동으로 변경 합니다.   
 서울,홍콩,도쿄 간의 High Availability 를 구성 합니다.   
 #### Replica 구성
