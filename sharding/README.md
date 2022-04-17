@@ -19,7 +19,8 @@ Shard 구성은 2개로 하여 줍니다.
 <img src="/sharding/images/images03.png" width="70%" height="70%"> 
 
 #### Database & Collection 구성
-mongosh 로 접속 한 후에 데이터 베이스를 생성 하고 컬렉션을 생성 하여 줍니다. 연결하기 위한 정보는 Database cluster 에 Connect에서 확인 할 수 있습니다.
+mongosh 로 접속 한 후에 데이터 베이스를 생성 하고 컬렉션을 생성 하여 줍니다. 연결하기 위한 정보는 Database cluster 에 Connect에서 확인 할 수 있습니다.    
+
 <img src="/sharding/images/images04.png" width="70%" height="70%"> 
 
 접속 후 Database 와 Collection 을 생성 한 후 Shard 를 enable 하여 줍니다.
@@ -79,7 +80,7 @@ Compass 를 이용하여 연결 후 데이터(demo-data.json)를 import 하여 �
 
 Json 형태로 하여 import를 진행 합니다.
 
-<img src="/sharding/images/images06.png" width="70%" height="70%"> 
+<img src="/sharding/images/images06.png" width="50%" height="50%"> 
 
 데이터 import가 완료 된 화면
 
