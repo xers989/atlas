@@ -358,10 +358,10 @@ Atlas atlas-10lm9v-shard-3 [direct: primary] ShardDatabase> db.LocalityCollectio
 Americas 로 설정 된 Replica Set 에 대해 읽기 부분을 추가 하는 것으로 타지역에 노드를 추가 하여 줍니다.
 Virginia 에 생성 된 Zone 에 대해사 설정을 변경을 위해 Zone Configuration 에서 multi-region, multi-cloud 를 On 하여 줍니다.
 
-<img src="/data-locality/images/images15.png" width="70%" height="70%"> 
+<img src="/data-locality/images/images16.png" width="70%" height="70%"> 
 
 읽기 전용 노드로 Seoul 에 노드를 추가 하여 줍니다.    
-<img src="/data-locality/images/images15.png" width="70%" height="70%"> 
+<img src="/data-locality/images/images17.png" width="70%" height="70%"> 
 
 설정을 완료 하면 Seoul 에 Americas 의 읽기 전용 노드가 생성 됩니다.
 
@@ -370,4 +370,4 @@ Virginia 에 생성 된 Zone 에 대해사 설정을 변경을 위해 Zone Confi
 Additional Options 에 현재 1로 설정 된 Shard 를 2로 추가 하여 주면 Shard가 2개로 구성 됩니다.     
 
 
-<img src="/data-locality/images/images15.png" width="70%" height="70%"> 
+<img src="/data-locality/images/images18.png" width="70%" height="70%"> 
