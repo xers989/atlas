@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mongodb.prudential</groupId>
+  <artifactId>MongoDB-samples</artifactId>
+  <version>1.0.0</version>
+  
+  <properties>
+        <maven-compiler-plugin.source>8</maven-compiler-plugin.source>
+        <maven-compiler-plugin.target>8</maven-compiler-plugin.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mongodb-driver-sync.version>4.5.0</mongodb-driver-sync.version>
+        <logback-classic.version>1.2.3</logback-classic.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+  </properties>
+    
+  <dependencies>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>${mongodb-driver-sync.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-classic.version}</version>
+        </dependency>
+    </dependencies>
+    
+  <build>
+    <plugins>
+
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>
+                                    com.mongodb.prudential.LoadGenData
+                                </mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+
+    </plugins>
+</build>
+</project>
