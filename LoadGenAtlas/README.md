@@ -1,5 +1,5 @@
-### LoadGenMongoDB
-MongoDB Load generator
+### LoadGenAtlas
+Atlas MongoDB Load generator
 
 #### Usage
 
@@ -154,7 +154,7 @@ Success Insert Document : 100
 
 컴렉션 정보를 확인 하면 데이터가 들어간 것을 확인 할 수 있습니다.
 
-<img src="/LoadGenMongoDB/images/images01.png" width="70%" height="70%">    
+<img src="/LoadGenAtlas/images/images01.png" width="70%" height="70%">    
 
 #### Find Test
 
@@ -272,7 +272,7 @@ Success Update Document : 100
 `````
 
 데이터를 확인 하면 다음과 같이 데이터가 수정된 것을 확인 할 수 있습니다.
-<img src="/LoadGenMongoDB/images/images01.png" width="70%" height="70%">    
+<img src="/LoadGenAtlas/images/images02.png" width="70%" height="70%">    
 
 #### Delete Test
 
@@ -321,3 +321,4 @@ Success Delete Document : 100
 `````
 데이터를 검색 하면 데이터가 없는 것을 확인 할 수 있습니다.
 
+<img src="/LoadGenAtlas/images/images03.png" width="70%" height="70%">  
