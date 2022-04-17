@@ -1,35 +1,136 @@
-### Atlas Multi Region
+### Sharding
 
-클라우드간 혹은 데이터 센터간에 클로한 형태로 클러스터를 구성합니다.   
-Auto-failover 로 구성하여 maximum high availability를 구현    
+Shard를 구성하고 Shard Key를 지정 합니다.
+문서의 매뉴얼은 다음을 참고 합니다.   
+https://www.mongodb.com/docs/atlas/atlas-ui/collections/
+
+#### Shard 구성
+Atlas Console에 로그인 한 후 샤드 클러스터를 구성 합니다.   
+구성은 최소 M30이며 AWS의 서울 지역에 생성 합니다.   
+Additional Settings에 Shard Option 을 On으로 변경 하여 줍니다.
+<img src="/sharding/images/images01.png" width="70%" height="70%"> 
+
+Shard 구성은 2개로 하여 줍니다.   
+<img src="/sharding/images/images02.png" width="70%" height="70%"> 
+
+클러스터를 생성 하여 줍니다.
+
+생성된 클러스터 정보를 확인 하면 2개의 Shard 가 구성된 것을 확인 할 수 있습니다.
+<img src="/sharding/images/images03.png" width="70%" height="70%"> 
+
+#### Database & Collection 구성
+mongosh 로 접속 한 후에 데이터 베이스를 생성 하고 컬렉션을 생성 하여 줍니다. 연결하기 위한 정보는 Database cluster 에 Connect에서 확인 할 수 있습니다.
+<img src="/sharding/images/images04.png" width="70%" height="70%"> 
+
+접속 후 Database 와 Collection 을 생성 한 후 Shard 를 enable 하여 줍니다.
+`````
+% mongosh "mongodb+srv://shardedcluster.5qjlg.mongodb.net/myFirstDatabase" --apiVersion 1 --username ****
+Enter password: **********
+
+Atlas [mongos] myFirstDatabase> use shardDB
+switched to db shardDB
+Atlas [mongos] shardDB> db.createCollection("shardCustomer")
+
+Atlas [mongos] shardDB> sh.enableSharding("shardDB")
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1650196244, i: 1 }),
+    signature: {
+      hash: Binary(Buffer.from("72e70d3f088153d7f38402bc5c68e233c0d268c2", "hex"), 0),
+      keyId: Long("7087535176225390615")
+    }
+  },
+  operationTime: Timestamp({ t: 1650196244, i: 1 })
+}
+
+`````
+Hashed 를 이용한 샤드 구성을 위해 인덱스를 사전에 선언 하고 컬렉션에 Shard 설정을 하여 줍니다.
+입력할 데이터는 다음과 같은 형태로 customer_id 를 기준으로 하여 hash key를 구성합니다.
+`````
+{"customer_id":"114380130","firstName":"Jorge","lastName":"Maruyama","address":"243 Awadiz Circle","city":"Gobema","state":"ND","zip":"04692","location":"JP","age":31}
+`````
+컬렉션을 설정 합니다.
+`````
+Atlas [mongos] shardDB> db.shardCustomer.createIndex({customer_id:"hashed"})
+customer_id_hashed
+
+Atlas [mongos] shardDB> sh.shardCollection("shardDB.shardCustomer",{customer_id:"hashed"})
+{
+  collectionsharded: 'shardDB.shardCustomer',
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1650196249, i: 16 }),
+    signature: {
+      hash: Binary(Buffer.from("e8c3c8dd65231b18cb9bd78ba9562cebfad4110f", "hex"), 0),
+      keyId: Long("7087535176225390615")
+    }
+  },
+  operationTime: Timestamp({ t: 1650196249, i: 9 })
+}
+
+`````
+
+#### Data import 와 분산 확인
+
+Compass 를 이용하여 연결 후 데이터(demo-data.json)를 import 하여 줍니다.   
+
+<img src="/sharding/images/images05.png" width="70%" height="70%"> 
+
+Json 형태로 하여 import를 진행 합니다.
+
+<img src="/sharding/images/images06.png" width="70%" height="70%"> 
+
+데이터 import가 완료 된 화면
 
 
+<img src="/sharding/images/images07.png" width="70%" height="70%"> 
 
-클러스터의 Replica set 구성시 다른 member 를 다른 region 에 구성    
-다음과 같이 3개의 다른 지역을 사용하여 Replica Set 을 구성합니다. (서울, 도쿄, 홍콩)   
-<img src="/multi-region/images/images06.png" width="70%" height="70%"> 
+Mongosh 에 접속하여 Data 분산 내용을 확인 합니다.
 
+`````
+% mongosh "mongodb+srv://shardedcluster.5qjlg.mongodb.net/myFirstDatabase" --apiVersion 1 --username ***
+Enter password: **********
 
-자동으로 클라이언트 애플리케이션의 mongodb driver 는 primary host 를 찾아서 접근 하며 fail over 시 자동으로 변경 합니다.   
-서울,홍콩,도쿄 간의 High Availability 를 구성 합니다.   
-#### Replica 구성
+Atlas [mongos] myFirstDatabase> 
 
-MongoDB는 3.6 이상으로 구성 합니다.   
-Atlas Console 로그인   
+Atlas [mongos] myFirstDatabase> use shardDB
+switched to db shardDB
 
-New Cluster 를 클릭 하고 배포를 할 지역을 선택 합니다. (서울 선택)    
-<img src="/multi-region/images/images02.png" width="70%" height="70%"> 
-
-Cloud Provider & Region 을 선택 후 Multi-Cloud, Multi-Region & Workload Isolation 을 On 하여 줍니다.    
-<img src="/multi-region/images/images01.png" width="70%" height="70%">  
-
-배포할 노드의 개수를 조정 합니다. (1개로 수정)    
-<img src="/multi-region/images/images03.png" width="70%" height="70%">  
-
-Add a provider/region 을 클릭하여 노드를 추가 하여 줍니다.
-<img src="/multi-region/images/images04.png" width="70%" height="70%">  
-
-리스트의 순서에 따라 Primary 에 대한 우선순위가 지정 됩니다. 리스트 맨앞 아이콘을 드래그 하여 순서를 조정 할 수 있습니다.    
-
-추가로 노드를 구성 할 수 있으며 Read-only, Analytics nodes 로 추가 구성 할 수 있습니다.    
-<img src="/multi-region/images/images05.png" width="70%" height="70%">  
+Atlas [mongos] shardDB> db.shardCustomer.getShardDistribution()
+Shard atlas-27u9bh-shard-0 at atlas-27u9bh-shard-0/atlas-27u9bh-shard-00-00.5qjlg.mongodb.net:27017,atlas-27u9bh-shard-00-01.5qjlg.mongodb.net:27017,atlas-27u9bh-shard-00-02.5qjlg.mongodb.net:27017
+{
+  data: '51KiB',
+  docs: 270,
+  chunks: 2,
+  'estimated data per chunk': '25KiB',
+  'estimated docs per chunk': 135
+}
+---
+Shard atlas-27u9bh-shard-1 at atlas-27u9bh-shard-1/atlas-27u9bh-shard-01-00.5qjlg.mongodb.net:27017,atlas-27u9bh-shard-01-01.5qjlg.mongodb.net:27017,atlas-27u9bh-shard-01-02.5qjlg.mongodb.net:27017
+{
+  data: '43KiB',
+  docs: 230,
+  chunks: 2,
+  'estimated data per chunk': '21KiB',
+  'estimated docs per chunk': 115
+}
+---
+Totals
+{
+  data: '95KiB',
+  docs: 500,
+  chunks: 4,
+  'Shard atlas-27u9bh-shard-0': [
+    '54.05 % data',
+    '54 % docs in cluster',
+    '195B avg obj size on shard'
+  ],
+  'Shard atlas-27u9bh-shard-1': [
+    '45.94 % data',
+    '46 % docs in cluster',
+    '195B avg obj size on shard'
+  ]
+}
+`````
+총 500 개의 문서가 있으며 Shard1 과 Shard2에 각각 270 개, 230개 가 있는 것을 확인 할 수 있습니다.
