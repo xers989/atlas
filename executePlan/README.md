@@ -506,92 +506,59 @@ db.movies.find({rated:"UNRATED"}).sort({runtime:1}).explain('executionStats')
 인덱스에 정렬을 위한 부분이 추가 되었기 때문에 executionStats에 SORT가 제외 되었고 사용한 인덱스 이름이 rated_1_runtime_1이 사용 된 것을 볼 수 있다. work수가 기존 1504dptj 752로 줄어 든 것을 볼 수 있다. (즉, 인덱스를 이용한 정렬이 이용되어 SORT 작업이 생략 된 것)
 Reject plan 에서 rated_1을 이용한 검색 (SORT -> FETCH -> IXSCAN)이 취소 된 것을 볼 수 있다
 
-
-#### Read 테스트
-생성된 Replica Set 의 데이터를 읽기 작업을 진행 합니다. 서울의 경우 Primary 가 위치한 곳임으로 빠르게 읽기가 진행 됩니다.
-다음은 MongoDB 와 연결을 위한 Connection String 정보 입니다.
-`````
-mongodb+srv://multicluster.5qjlg.mongodb.net/myFirstDatabase?retryWrites=true&w=3
-`````
-한국에서 100 개의 데이터를 읽기 작업 한 경우 결과는 다음과 같습니다.
+#### Plan Cache
+쿼리가 실행 되면 실행 되는 계획은 캐시에 저장 된다. 그 개수는 internalQueryCacheSize 에서 저장 가능한 QueryPlan의 개수를 볼 수 있다. 
 
 `````
-[opc@docker-server ~]$ java -jar MongoDB-samples-1.0.0-jar-with-dependencies.jar command.properties
-Find Thread #0 start
-Success Find Document : {"customer_id": 1, "person_group_code": "A"},922
-Success Find Document : {"customer_id": 2, "person_group_code": "A"},6
-Success Find Document : {"customer_id": 3, "person_group_code": "A"},7
-Success Find Document : {"customer_id": 4, "person_group_code": "A"},6
-Success Find Document : {"customer_id": 5, "person_group_code": "A"},5
-Success Find Document : {"customer_id": 6, "person_group_code": "A"},5
-Success Find Document : {"customer_id": 7, "person_group_code": "A"},6
-Success Find Document : {"customer_id": 8, "person_group_code": "A"},5
-Success Find Document : {"customer_id": 9, "person_group_code": "A"},5
-Success Find Document : {"customer_id": 10, "person_group_code": "A"},5
-...
-Success Find Document : {"customer_id": 96, "person_group_code": "A"},5
-Success Find Document : {"customer_id": 97, "person_group_code": "A"},4
-Success Find Document : {"customer_id": 98, "person_group_code": "A"},4
-Success Find Document : {"customer_id": 99, "person_group_code": "A"},5
-Success Find Document : {"customer_id": 100, "person_group_code": "A"},4
-Find Thread #0 end
+admin> db.runCommand({getParameter:1,"internalQueryCacheSize":1})
+{
+  internalQueryCacheSize: 5000,
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1650941672, i: 1 }),
+    signature: {
+      hash: Binary(Buffer.from("1963344f3d3457555567831317150277e051198c", "hex"), 0),
+      keyId: Long("7030059919575351301")
+    }
+  },
+  operationTime: Timestamp({ t: 1650941672, i: 1 })
+}
 `````
-읽기의 결과가 5ms 정도로 빠르게 읽기가 진행 되는 것을 볼 수 있습니다. (처음 읽기 작업은 MongoDB와 연결을 하는 부분이 포함되어 922ms 가 나옵니다)
-
-미국에서 동일한 테스트를 진행 한 결과는 다음과 같습니다.
+저장 된 플랜은 해당 컬렉션의 인덱스가 변경 되지 않는 다면 저장 되며 개수가 넘어가면 오래된 것 부터 삭제 된다.
+해당 내용을 확인 해 볼 수 있다.
 
 `````
-$ java -jar MongoDB-samples-1.0.0-jar-with-dependencies.jar command.properties 
-Find Thread #0 start
-Success Find Document : {"customer_id": 1, "person_group_code": "A"},1792
-Success Find Document : {"customer_id": 2, "person_group_code": "A"},138
-Success Find Document : {"customer_id": 3, "person_group_code": "A"},135
-Success Find Document : {"customer_id": 4, "person_group_code": "A"},136
-Success Find Document : {"customer_id": 5, "person_group_code": "A"},135
-Success Find Document : {"customer_id": 6, "person_group_code": "A"},135
-Success Find Document : {"customer_id": 7, "person_group_code": "A"},137
-Success Find Document : {"customer_id": 8, "person_group_code": "A"},139
-Success Find Document : {"customer_id": 9, "person_group_code": "A"},135
-Success Find Document : {"customer_id": 10, "person_group_code": "A"},135
-...
-Success Find Document : {"customer_id": 97, "person_group_code": "A"},133
-Success Find Document : {"customer_id": 98, "person_group_code": "A"},134
-Success Find Document : {"customer_id": 99, "person_group_code": "A"},134
-Success Find Document : {"customer_id": 100, "person_group_code": "A"},133
-Find Thread #0 end
-
+sample_mflix> db.movies.getPlanCache().list()
+[
+  {
+    queryHash: '96439EE1',
+    planCacheKey: 'D0C6C30C',
+    isActive: false,
+    works: Long("101"),
+    timeOfCreation: ISODate("2022-04-26T02:57:11.885Z"),
+    createdFromQuery: {
+      query: { rated: 'UNRATED' },
+      sort: { runtime: 1 },
+      projection: {}
+    },
+    cachedPlan: {
+      stage: 'FETCH',
+      inputStage: {
+        stage: 'IXSCAN',
+        keyPattern: { rated: 1, runtime: 1 },
+        indexName: 'rated_1_runtime_1',
+        isMultiKey: false,
+        multiKeyPaths: { rated: [], runtime: [] },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: {
+          rated: [ '["UNRATED", "UNRATED"]' ],
+          runtime: [ '[MinKey, MaxKey]' ]
+        }
+      }
+    },
+..
 `````
-서울에서 읽기 작업이 진행 되기 때문에 읽기 시간이 평균 약 135ms 가 소요 됩니다.
-
-다음은 읽기를 조정하여 가장 가까운 곳에서 읽기 (nearest)로 조정 합니다. Primary, Secondary 를 포함하여 가장 가까운 (응답시간이 빠른)곳으로 읽기 연결을 하는 것임니다. 3개 지역에 모두 동일한 데이터가 존재 함으로 데이터 읽기에 대한 불일치는 없습니다.
-
-연결을 위한 String은 다음과 같습니다.
-`````
-mongodb+srv://multicluster.5qjlg.mongodb.net/myFirstDatabase?retryWrites=true&w=3&readpreference=nearest
-
-`````
-
-서울의 경우 성능에 차이가 없음으로 산호세에서 테스트를 진행 합니다.
-
-`````
-$ java -jar MongoDB-samples-1.0.0-jar-with-dependencies.jar command.properties 
-Find Thread #0 start
-Success Find Document : {"customer_id": 1, "person_group_code": "A"},869
-Success Find Document : {"customer_id": 2, "person_group_code": "A"},14
-Success Find Document : {"customer_id": 3, "person_group_code": "A"},5
-Success Find Document : {"customer_id": 4, "person_group_code": "A"},6
-Success Find Document : {"customer_id": 5, "person_group_code": "A"},5
-Success Find Document : {"customer_id": 6, "person_group_code": "A"},13
-Success Find Document : {"customer_id": 7, "person_group_code": "A"},5
-Success Find Document : {"customer_id": 8, "person_group_code": "A"},6
-Success Find Document : {"customer_id": 9, "person_group_code": "A"},5
-Success Find Document : {"customer_id": 10, "person_group_code": "A"},5
-...
-Success Find Document : {"customer_id": 97, "person_group_code": "A"},3
-Success Find Document : {"customer_id": 98, "person_group_code": "A"},4
-Success Find Document : {"customer_id": 99, "person_group_code": "A"},6
-Success Find Document : {"customer_id": 100, "person_group_code": "A"},3
-Find Thread #0 end
-
-`````
-결과와 같이 약 6 ms 정도로 빠른 읽기 성능이 보여 집니다.
